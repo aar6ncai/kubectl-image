@@ -1,0 +1,30 @@
+apiVersion: batch/v2alpha1
+kind: CronJob
+metadata:
+  name: hello-kube-config
+  namespace: kube-system-aaron-test
+spec:
+  schedule: "*/2 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: hello
+            image: busybox
+            volumeMounts:
+            - name: kube-config
+              mountPath: "/root/.kube"
+              readOnly: true
+            args:
+            - /bin/sh
+            - -c
+            - date; cat /root/.kube/config
+          volumes:
+          - name: kube-config
+            secret:
+              secretName: dev-kube-config
+              items:
+              - key: config
+                path: config
+          restartPolicy: OnFailure
